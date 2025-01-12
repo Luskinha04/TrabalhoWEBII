@@ -9,15 +9,26 @@ class ItemPedido extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'produto_id', 'quantidade', 'preco_unitario'];
+    protected $table = 'item_pedido'; // Nome correto da tabela no banco
 
-    // Relacionamento com Pedido
+    protected $fillable = [
+        'order_id',
+        'produto_id',
+        'quantidade',
+        'preco_unitario',
+    ];
+
+    /**
+     * Relacionamento com Pedido
+     */
     public function pedido()
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    // Relacionamento com Produto
+    /**
+     * Relacionamento com Produto
+     */
     public function produto()
     {
         return $this->belongsTo(Produto::class, 'produto_id');

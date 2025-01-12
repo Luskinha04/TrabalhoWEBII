@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateItemPedidoTable extends Migration
 {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('item_pedido', function (Blueprint $table) {
@@ -18,6 +23,11 @@ class CreateItemPedidoTable extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         Schema::dropIfExists('item_pedido');
