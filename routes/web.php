@@ -8,8 +8,8 @@ use App\Http\Controllers\OrderController;
 
 // Rota inicial
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('menu');
+})->name('menu');
 
 // Rotas CRUD para Categorias
 Route::resource('categorias', CategoryController::class)->names([
