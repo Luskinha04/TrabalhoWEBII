@@ -12,13 +12,17 @@ class ClienteSeeder extends Seeder
         Cliente::create([
             'name' => 'Cliente Teste 1',
             'email' => 'cliente1@teste.com',
-            'phone' => '123456789',
         ]);
 
         Cliente::create([
             'name' => 'Cliente Teste 2',
             'email' => 'cliente2@teste.com',
-            'phone' => '987654321',
+        ]);
+
+        Cliente::create([
+            'name' => 'Cliente Teste 3',
+            'email' => 'cliente3@teste.com',
         ]);
     }
 }
+

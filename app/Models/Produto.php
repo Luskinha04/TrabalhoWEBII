@@ -9,11 +9,17 @@ class Produto extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price', 'stock', 'category_id'];
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'stock',
+        'category_id',
+    ];
 
-    public function category()
+    // Relacionamento: um produto pode estar em vários pedidos.
+    public function itens()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->hasMany(OrderItem::class);
     }
 }
-

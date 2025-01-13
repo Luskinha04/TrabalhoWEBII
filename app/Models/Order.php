@@ -4,22 +4,39 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\OrderItem;
 
 class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['cliente_id', 'total'];
+    /**
+     * Os atributos que podem ser atribuídos em massa.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'cliente_id',
+        'total',
+    ];
 
-    // Relacionamento com os Itens do Pedido
-    public function items()
-    {
-        return $this->hasMany(ItemPedido::class, 'order_id');
-    }
-
-    // Relacionamento com Cliente (adicionar futuramente)
+    /**
+     * Relacionamento: um pedido pertence a um cliente.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
     }
-}
+
+    /**
+     * Relacionamento: um pedido tem muitos itens.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function itens()
+    {
+        return $this->hasMany(OrderItem::class, 'order_id');
+    }    
+}    
