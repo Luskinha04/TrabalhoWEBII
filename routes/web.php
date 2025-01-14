@@ -1,56 +1,65 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\OrderController;
+use Illuminate\Support\Facades\Route;
 
-// Rota inicial
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+// Página inicial (Login)
 Route::get('/', function () {
-    return view('menu');
-})->name('menu');
+    return view('welcome');
+});
 
-// Rotas CRUD para Categorias
-Route::resource('categorias', CategoryController::class)->names([
-    'index' => 'categorias.index',
-    'create' => 'categorias.create',
-    'store' => 'categorias.store',
-    'show' => 'categorias.show',
-    'edit' => 'categorias.edit',
-    'update' => 'categorias.update',
-    'destroy' => 'categorias.destroy',
-]);
+// Dashboard padrão
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// Rotas CRUD para Clientes
-Route::resource('clientes', ClienteController::class)->names([
-    'index' => 'clientes.index',
-    'create' => 'clientes.create',
-    'store' => 'clientes.store',
-    'show' => 'clientes.show',
-    'edit' => 'clientes.edit',
-    'update' => 'clientes.update',
-    'destroy' => 'clientes.destroy',
-]);
+// Rotas protegidas para os perfis (Autenticação)
+Route::middleware(['auth'])->group(function () {
+    // Página inicial do menu
+    Route::get('/menu', [MenuController::class, 'index'])->name('menu');
 
-// Rotas CRUD para Produtos
-Route::resource('produtos', ProdutoController::class)->names([
-    'index' => 'produtos.index',
-    'create' => 'produtos.create',
-    'store' => 'produtos.store',
-    'show' => 'produtos.show',
-    'edit' => 'produtos.edit',
-    'update' => 'produtos.update',
-    'destroy' => 'produtos.destroy',
-]);
+    // Rotas específicas para "patrão"
+    Route::middleware(['auth', 'role.patrao'])->group(function () {
+        Route::resource('categorias', CategoryController::class);
+    });
 
-// Rotas CRUD para Pedidos (Orders)
-Route::resource('order', OrderController::class)->names([
-    'index' => 'order.index',
-    'create' => 'order.create',
-    'store' => 'order.store',
-    'show' => 'order.show',
-    'edit' => 'order.edit',
-    'update' => 'order.update',
-    'destroy' => 'order.destroy',
-]);
+    // Rotas específicas para "funcionário"
+    Route::middleware('role:funcionario')->group(function () {
+        Route::resource('produtos', ProdutoController::class);
+        Route::resource('order', OrderController::class);
+    });
+
+    // Rotas acessíveis a ambos
+    Route::resource('clientes', ClienteController::class);
+});
+
+// Rotas relacionadas ao perfil do usuário
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Rotas específicas para "patrão" acessarem "order"
+Route::middleware(['role:patrão'])->group(function () {
+    Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+});
+
+// Inclui as rotas de autenticação (Laravel Breeze)
+require __DIR__ . '/auth.php';

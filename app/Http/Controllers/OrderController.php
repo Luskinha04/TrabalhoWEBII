@@ -106,4 +106,8 @@ class OrderController extends Controller
         // Redireciona para a lista de pedidos com uma mensagem de sucesso
         return redirect()->route('order.index')->with('success', 'Pedido excluído com sucesso!');
     }
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:patrão']);
+    }
 }

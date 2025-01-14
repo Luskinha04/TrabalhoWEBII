@@ -2,31 +2,38 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        \App\Models\User::factory()->create([
-            'name' => 'UserA',
-            'email' => 'usera@example.com',
-            'password' => Hash::make('usera'),
-        ]);
-        \App\Models\User::factory()->create([
-            'name' => 'UserB',
-            'email' => 'userb@example.com',
-            'password' => Hash::make('userb'),
-        ]);
-        \App\Models\User::factory()->create([
-            'name' => '1',
-            'email' => '1@exemple.com',
-            'password' => Hash::make('1'),
-        ]);
+        $patraoRole = Role::firstOrCreate(['name' => 'patrão']);
+        $funcionarioRole = Role::firstOrCreate(['name' => 'funcionário']);
+
+        $patrao = User::updateOrCreate(
+            ['email' => 'patrao@example.com'],
+            [
+                'name' => 'Patrão',
+                'password' => bcrypt('123'),
+                'role' => 'patrão',
+            ]
+        );
+
+        $patrao->syncRoles([$patraoRole]);
+
+        $funcionario = User::updateOrCreate(
+            ['email' => 'funcionario@example.com'],
+            [
+                'name' => 'Funcionário',
+                'password' => bcrypt('123'),
+                'role' => 'funcionário',
+            ]
+        );
+
+        $funcionario->syncRoles([$funcionarioRole]);
     }
 }
