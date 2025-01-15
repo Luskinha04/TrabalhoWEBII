@@ -9,17 +9,21 @@ class Produto extends Model
 {
     use HasFactory;
 
+    // Defina a tabela que este modelo irá usar
+    protected $table = 'produto';
+
+    // Defina os campos que podem ser preenchidos em massa
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
-        'category_id',
+        'nome', 
+        'descricao', 
+        'preco', 
+        'estoque'
     ];
 
-    // Relacionamento: um produto pode estar em vários pedidos.
-    public function itens()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
+    // Defina os campos que serão convertidos para um tipo específico
+    protected $casts = [
+        'preco' => 'decimal:2', // Garantir que o preço seja sempre no formato decimal com 2 casas
+    ];
+
+    public $timestamps = false;
 }

@@ -1,65 +1,37 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ProdutoControllerAdmin;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-// Página inicial (Login)
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Dashboard padrão
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/cadastro', [UsuarioController::class, 'create'])->name('usuario.create');
+Route::post('/cadastro', [UsuarioController::class, 'store'])->name('usuario.store');
 
-// Rotas protegidas para os perfis (Autenticação)
-Route::middleware(['auth'])->group(function () {
-    // Página inicial do menu
-    Route::get('/menu', [MenuController::class, 'index'])->name('menu');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
-    // Rotas específicas para "patrão"
-    Route::middleware(['auth', 'role.patrao'])->group(function () {
-        Route::resource('categorias', CategoryController::class);
+Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos');
+
+
+Route::get('/carrinho', [VendaController::class, 'showCarrinho'])->name('carrinho');
+Route::post('/venda', [VendaController::class, 'criarVenda'])->name('venda.criar');
+Route::get('/venda/sucesso', [VendaController::class, 'vendaSucesso'])->name('venda.sucesso');
+
+
+Route::get('/admin/login', [AdminController::class, 'loginForm'])->name('admin.loginForm');
+Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.login');
+
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::group(['before' => 'auth'], function () {
+        Route::resource('produtos', ProdutoControllerAdmin::class)->except(['show']);
     });
-
-    // Rotas específicas para "funcionário"
-    Route::middleware('role:funcionario')->group(function () {
-        Route::resource('produtos', ProdutoController::class);
-        Route::resource('order', OrderController::class);
-    });
-
-    // Rotas acessíveis a ambos
-    Route::resource('clientes', ClienteController::class);
 });
-
-// Rotas relacionadas ao perfil do usuário
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-// Rotas específicas para "patrão" acessarem "order"
-Route::middleware(['role:patrão'])->group(function () {
-    Route::get('/order', [OrderController::class, 'index'])->name('order.index');
-});
-
-// Inclui as rotas de autenticação (Laravel Breeze)
-require __DIR__ . '/auth.php';
